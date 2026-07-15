@@ -1,0 +1,19 @@
+body {
+    background-color: red;
+}
+
+.navbar {
+    background-color: #333;
+    width: 100%;
+}
+
+.ul-navbar {
+    background-color: blue;
+    width: 50%;
+    height: 100px;
+}
+
+.li-navbar {
+    border: 5px solid black;
+    list-style-type: none;
+}

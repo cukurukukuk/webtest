@@ -3,58 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portofolio Saya</title>
-    <!-- Menghubungkan ke file CSS -->
+    <title>Terminal Portofolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- NAVIGASI -->
-    <nav>
-        <div class="logo">MyPortfolio</div>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#projects">Projects</a></li>
-        </ul>
-    </nav>
+    <!-- Kanvas untuk efek latar belakang partikel -->
+    <canvas id="particle-canvas"></canvas>
 
-    <!-- HERO SECTION -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Halo, Saya <span class="highlight">Seorang Developer</span></h1>
-            <p>Selamat datang di ruang kreatif digital saya. Saya senang membangun hal-hal menarik di internet.</p>
-            <button id="cta-btn">Sapa Saya!</button>
-        </div>
-    </section>
-
-    <!-- ABOUT SECTION -->
-    <section id="about" class="about">
-        <h2>Tentang Saya</h2>
-        <p>Saya adalah seorang pembuat web pemula yang sedang antusias mempelajari teknologi terbaru. Saat ini saya fokus mempelajari HTML, CSS, JavaScript, dan bagaimana cara membagikan proyek saya melalui GitHub.</p>
-    </section>
-
-    <!-- PROJECTS SECTION -->
-    <section id="projects" class="projects">
-        <h2>Proyek Saya</h2>
-        <div class="project-grid">
-            <div class="project-card">
-                <h3>Proyek Pertama</h3>
-                <p>Website sederhana yang di-hosting langsung menggunakan GitHub Pages.</p>
+    <div class="container">
+        <!-- HEADER / HERO -->
+        <header class="glass-card">
+            <div class="status-indicator">
+                <span class="dot pulse"></span> Online & Active
             </div>
-            <div class="project-card">
-                <h3>Desain Kreatif</h3>
-                <p>Eksperimen menggunakan CSS Grid dan Flexbox untuk membuat tampilan responsif.</p>
-            </div>
-        </div>
-    </section>
+            <h1>Halo, Saya <span class="typewriter" id="typewriter"></span></h1>
+            <p class="subtitle">Peneliti Keamanan Web & Pengembang Antarmuka.</p>
+        </header>
 
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2026 MyPortfolio. Dibuat dengan belajar bersama GitHub.</p>
-    </footer>
+        <!-- MAIN GRID -->
+        <main class="grid">
+            <!-- TENTANG SAYA -->
+            <section class="glass-card">
+                <h2>[01] Info Profil</h2>
+                <p>Saya adalah seorang pengembang yang berfokus pada eksplorasi teknologi web dan keamanan sistem. Senang memecahkan masalah kompleks dan mengubah baris kode menjadi visual yang interaktif.</p>
+                <div class="skills-tag">
+                    <span>HTML5</span>
+                    <span>CSS3</span>
+                    <span>JavaScript</span>
+                    <span>Git</span>
+                    <span>Linux</span>
+                </div>
+            </section>
 
-    <!-- Menghubungkan ke file JavaScript -->
+            <!-- TERMINAL INTERAKTIF (Fitur Unggulan) -->
+            <section class="glass-card terminal-section">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="t-btn red"></span>
+                        <span class="t-btn yellow"></span>
+                        <span class="t-btn green"></span>
+                    </div>
+                    <span class="terminal-title">guest@portfolio:~</span>
+                </div>
+                <div class="terminal-body" id="terminal-body">
+                    <p class="terminal-text">Ketik <span class="highlight">help</span> untuk melihat daftar perintah yang tersedia.</p>
+                    <div id="terminal-history"></div>
+                    <div class="terminal-input-line">
+                        <span class="prompt">$</span>
+                        <input type="text" id="terminal-input" autofocus autocomplete="off" placeholder="ketik perintah di sini...">
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="glass-card">
+            <p>// Dirancang dengan HTML, CSS, & JS. Bebas digunakan.</p>
+        </footer>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

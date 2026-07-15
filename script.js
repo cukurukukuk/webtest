@@ -62,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 - <span class="highlight">clear</span> : Membersihkan layar terminal`;
             } else if (command === "about") {
                 p.innerHTML += `Saya tertarik pada dunia pemrograman, web design, dan pengujian keamanan aplikasi.`;
+            } else if (command === "bounty"){
+                p.innerHTML += 'Total bounty saya sekarang adalah 600 dollar.';
             } else if (command === "skills") {
                 p.innerHTML += `Keahlian: HTML, CSS, JavaScript, Git, Linux Environment, & Problem Solving.`;
             } else if (command === "clear") {

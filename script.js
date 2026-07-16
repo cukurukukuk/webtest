@@ -1,148 +1,175 @@
-document.addEventListener("DOMContentLoaded", () => {
+// Database Jadwal Kamu (Sesuai dengan jadwal harian yang sudah kita rapikan)
+const dailySchedule = [
+    { id: 1, start: "05:00", end: "05:30", category: "Pagi", title: "Subuh", desc: "Bangun Pagi & Shalat Subuh", icon: "fa-solid fa-mosque", color: "text-amber-400" },
+    { id: 2, start: "05:30", end: "06:00", category: "Pagi", title: "Fisik", desc: "Olahraga Pagi (Kardio/Peregangan)", icon: "fa-solid fa-running", color: "text-teal-400" },
+    { id: 3, start: "06:00", end: "07:00", category: "Pagi", title: "Persiapan", desc: "Bersih-bersih Diri & Sarapan Sehat", icon: "fa-solid fa-shower", color: "text-sky-400" },
+    { id: 4, start: "07:00", end: "08:30", category: "Pagi", title: "Belajar (Sesi 1)", desc: "Core English Grammar (Teori & Pemahaman)", icon: "fa-solid fa-book-open", color: "text-indigo-400" },
+    { id: 5, start: "08:30", end: "09:00", category: "Pagi", title: "Jeda", desc: "Istirahat Ringan & Peregangan Otak", icon: "fa-solid fa-mug-hot", color: "text-rose-400" },
+    { id: 6, start: "09:00", end: "10:30", category: "Pagi", title: "Belajar (Sesi 2)", desc: "Praktik Berbicara & Simulasi Interview", icon: "fa-solid fa-comments", color: "text-violet-400" },
     
-    // --- 1. EFEK TYPEWRITER ---
-    const words = ["Creative Coder.", "Tech Explorer.", "Security Enthusiast."];
-    let i = 0;
-    let timer;
+    { id: 7, start: "10:30", end: "12:30", category: "Siang", title: "Istirahat Siang", desc: "Shalat Dzuhur, Makan Siang & Santai", icon: "fa-solid fa-utensils", color: "text-emerald-400" },
+    { id: 8, start: "12:30", end: "13:00", category: "Siang", title: "Power Nap", desc: "Tidur Siang Singkat (Maks 30 Menit)", icon: "fa-solid fa-bed", color: "text-blue-400" },
+    { id: 9, start: "13:00", end: "15:30", category: "Siang", title: "Bug Hunting (Sesi 1)", desc: "Analisis & Pencarian Celah Keamanan", icon: "fa-solid fa-bug", color: "text-red-400" },
+    { id: 10, start: "15:30", end: "16:00", category: "Siang", title: "Ashar", desc: "Istirahat & Shalat Ashar", icon: "fa-solid fa-mosque", color: "text-amber-400" },
+    
+    { id: 11, start: "16:00", end: "18:30", category: "Sore & Malam", title: "Santai Sore", desc: "Istirahat, Olahraga Ringan, atau Hobi", icon: "fa-solid fa-tree", color: "text-green-400" },
+    { id: 12, start: "18:30", end: "19:00", category: "Sore & Malam", title: "Maghrib", desc: "Shalat Maghrib & Makan Malam", icon: "fa-solid fa-mosque", color: "text-amber-400" },
+    { id: 13, start: "19:00", end: "19:30", category: "Sore & Malam", title: "Waktu Bebas", desc: "Melepaskan Penat / Me Time", icon: "fa-solid fa-gamepad", color: "text-fuchsia-400" },
+    { id: 14, start: "19:30", end: "20:00", category: "Sore & Malam", title: "Isya", desc: "Shalat Isya", icon: "fa-solid fa-mosque", color: "text-amber-400" },
+    { id: 15, start: "20:00", end: "21:30", category: "Sore & Malam", title: "Bug Hunting (Sesi 2)", desc: "Lanjutan Hunting, Eksploitasi, & Reporting", icon: "fa-solid fa-laptop-code", color: "text-cyan-400" },
+    
+    { id: 16, start: "21:30", end: "22:00", category: "Tidur", title: "Persiapan Tidur", desc: "Matikan Layar Laptop/HP, Rileksasi", icon: "fa-solid fa-moon", color: "text-indigo-300" },
+    { id: 17, start: "22:00", end: "23:59", category: "Tidur", title: "Tidur", desc: "Istirahat Total (Target 7 Jam Tidur)", icon: "fa-solid fa-z", color: "text-slate-500" },
+    { id: 18, start: "00:00", end: "05:00", category: "Tidur", title: "Tidur", desc: "Istirahat Total (Target 7 Jam Tidur)", icon: "fa-solid fa-z", color: "text-slate-500" }
+];
 
-    function typingEffect() {
-        let word = words[i].split("");
-        var loopTyping = function() {
-            if (word.length > 0) {
-                document.getElementById('typewriter').innerHTML += word.shift();
-            } else {
-                setTimeout(deletingEffect, 2000);
-                return false;
-            }
-            timer = setTimeout(loopTyping, 100);
-        };
-        loopTyping();
-    }
+// Memuat status checklist dari LocalStorage agar data aman saat page direfresh
+let checkedTasks = JSON.parse(localStorage.getItem('checkedTasks')) || {};
+let savedDate = localStorage.getItem('savedDate') || "";
 
-    function deletingEffect() {
-        let word = words[i].split("");
-        var loopDeleting = function() {
-            if (word.length > 0) {
-                word.pop();
-                document.getElementById('typewriter').innerHTML = word.join("");
-            } else {
-                if (words.length > (i + 1)) {
-                    i++;
-                } else {
-                    i = 0;
-                }
-                setTimeout(typingEffect, 500);
-                return false;
-            }
-            timer = setTimeout(loopDeleting, 50);
-        };
-        loopDeleting();
-    }
+// Logika Auto-Reset Harian (Saat ganti hari kalender)
+const todayStr = new Date().toDateString();
+if (savedDate !== todayStr) {
+    checkedTasks = {};
+    localStorage.setItem('checkedTasks', JSON.stringify(checkedTasks));
+    localStorage.setItem('savedDate', todayStr);
+}
 
-    typingEffect();
+// Me-render list jadwal ke UI HTML
+function renderRoutine() {
+    const container = document.getElementById('routine-container');
+    container.innerHTML = "";
 
+    // Kategori Urutan Tampil
+    const categories = ["Pagi", "Siang", "Sore & Malam", "Tidur"];
+    
+    categories.forEach(cat => {
+        const catFiltered = dailySchedule.filter(item => item.category === cat);
+        if (catFiltered.length === 0) return;
 
-    // --- 2. INTERAKTIF TERMINAL ---
-    const terminalInput = document.getElementById("terminal-input");
-    const terminalHistory = document.getElementById("terminal-history");
+        // Membuat section box untuk tiap Kategori
+        const section = document.createElement('section');
+        section.className = "bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm";
+        
+        const header = document.createElement('h2');
+        header.className = "text-lg font-bold text-slate-400 mb-4 flex items-center gap-2 tracking-wider uppercase text-xs";
+        header.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500"></span> ${cat}`;
+        section.appendChild(header);
 
-    terminalInput.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            const command = this.value.trim().toLowerCase();
-            const p = document.createElement("p");
-            p.style.marginBottom = "8px";
+        const listContainer = document.createElement('div');
+        listContainer.className = "space-y-3";
+
+        catFiltered.forEach(item => {
+            const uniqueKey = `task-${item.id}`;
+            const isChecked = checkedTasks[uniqueKey] ? 'checked' : '';
+            const opacityClass = checkedTasks[uniqueKey] ? 'opacity-40 line-through' : '';
+
+            const card = document.createElement('div');
+            card.id = `card-${item.id}`;
+            card.className = `flex items-center justify-between p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 transition-all duration-300 hover:bg-slate-800/80 ${opacityClass}`;
             
-            // Tampilkan kembali perintah yang diinput user
-            p.innerHTML = `<span style="color:#ff007f">$</span> <span style="color:#fff">${this.value}</span><br>`;
+            card.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <!-- Checkbox -->
+                    <label class="relative flex items-center p-1 rounded-full cursor-pointer">
+                        <input type="checkbox" ${isChecked} onchange="toggleTask('${uniqueKey}', ${item.id})" 
+                            class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-slate-600 transition-all checked:border-emerald-500 checked:bg-emerald-500" />
+                        <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" stroke-width="1">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </label>
 
-            if (command === "help") {
-                p.innerHTML += `Perintah yang tersedia:<br>
-                - <span class="highlight">about</span> : Penjelasan singkat tentang saya<br>
-                - <span class="highlight">skills</span> : Daftar skill teknis<br>
-                - <span class="highlight">clear</span> : Membersihkan layar terminal`;
-            } else if (command === "about") {
-                p.innerHTML += `Saya tertarik pada dunia pemrograman, web design, dan pengujian keamanan aplikasi.`;
-            } else if (command === "bounty"){
-                p.innerHTML += 'Total bounty saya sekarang adalah 600 dollar.';
-            } else if (command === "skills") {
-                p.innerHTML += `Keahlian: HTML, CSS, JavaScript, Git, Linux Environment, & Problem Solving.`;
-            } else if (command === "clear") {
-                terminalHistory.innerHTML = "";
-                this.value = "";
-                return;
-            } else if (command === "") {
-                p.innerHTML = `<span style="color:#ff007f">$</span>`;
-            } else {
-                p.innerHTML += `Perintah tidak dikenal: "${command}". Ketik <span class="highlight">help</span> untuk daftar bantuan.`;
-            }
+                    <!-- Jam Sesi -->
+                    <div class="text-xs font-mono font-semibold bg-slate-800 px-2.5 py-1 rounded-md text-emerald-300">
+                        ${item.start} - ${item.end}
+                    </div>
 
-            terminalHistory.appendChild(p);
-            this.value = "";
-            
-            // Auto scroll ke bawah
-            const body = document.getElementById("terminal-body");
-            body.scrollTop = body.scrollHeight;
+                    <!-- Informasi Aktivitas -->
+                    <div>
+                        <h3 class="font-semibold text-sm md:text-base flex items-center gap-2 text-slate-100">
+                            <i class="${item.icon} ${item.color} text-sm"></i> ${item.title}
+                        </h3>
+                        <p class="text-xs md:text-sm text-slate-400 mt-0.5">${item.desc}</p>
+                    </div>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+
+        section.appendChild(listContainer);
+        container.appendChild(section);
+    });
+    
+    updateActiveCard();
+}
+
+// Menyimpan perubahan checklist ke memory
+function toggleTask(uniqueKey, itemId) {
+    checkedTasks[uniqueKey] = !checkedTasks[uniqueKey];
+    localStorage.setItem('checkedTasks', JSON.stringify(checkedTasks));
+    
+    const card = document.getElementById(`card-${itemId}`);
+    if (checkedTasks[uniqueKey]) {
+        card.classList.add('opacity-40', 'line-through');
+    } else {
+        card.classList.remove('opacity-40', 'line-through');
+    }
+}
+
+// Logika pencarian jadwal aktif & menerapkan class highlight "active-session"
+function updateActiveCard() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTimeInMinutes = (currentHour * 60) + currentMinute;
+
+    dailySchedule.forEach(item => {
+        const card = document.getElementById(`card-${item.id}`);
+        if (!card) return;
+
+        const [startHour, startMin] = item.start.split(':').map(Number);
+        const [endHour, endMin] = item.end.split(':').map(Number);
+
+        const startTimeInMinutes = (startHour * 60) + startMin;
+        let endTimeInMinutes = (endHour * 60) + endMin;
+
+        let isCurrent = false;
+
+        // Penanganan deteksi jam khusus melewati tengah malam (misal 22:00 - 05:00)
+        if (endTimeInMinutes < startTimeInMinutes) {
+            isCurrent = (currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes);
+        } else {
+            isCurrent = (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes);
+        }
+
+        if (isCurrent) {
+            card.classList.add('active-session');
+        } else {
+            card.classList.remove('active-session');
         }
     });
+}
 
-
-    // --- 3. BACKGROUND PARTIKEL INTERAKTIF (CANVAS) ---
-    const canvas = document.getElementById("particle-canvas");
-    const ctx = canvas.getContext("2d");
-
-    let particles = [];
-    const particleCount = 60;
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 1;
-            this.speedX = Math.random() * 0.5 - 0.25;
-            this.speedY = Math.random() * 0.5 - 0.25;
+// Inisialisasi jam digital realtime berjalan
+function startClock() {
+    setInterval(() => {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('live-clock').innerText = `${hours}:${minutes}:${seconds}`;
+        
+        // Cek & perbarui card aktif setiap detik ke-00 (setiap menit berganti)
+        if (seconds === "00") {
+            updateActiveCard();
         }
+    }, 1000);
+}
 
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-
-            if (this.x > canvas.width) this.x = 0;
-            else if (this.x < 0) this.x = canvas.width;
-
-            if (this.y > canvas.height) this.y = 0;
-            else if (this.y < 0) this.y = canvas.height;
-        }
-
-        draw() {
-            ctx.fillStyle = "rgba(0, 240, 255, 0.4)";
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
-    function init() {
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-        requestAnimationFrame(animate);
-    }
-
-    init();
-    animate();
-});
+// Load aplikasi secara langsung ketika halaman siap dibuka
+window.onload = () => {
+    renderRoutine();
+    startClock();
+};

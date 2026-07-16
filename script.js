@@ -1,4 +1,4 @@
-// Database Jadwal Kamu (Sesuai dengan jadwal harian yang sudah kita rapikan)
+// Database Jadwal Kamu
 const dailySchedule = [
     { id: 1, start: "05:00", end: "05:30", category: "Pagi", title: "Subuh", desc: "Bangun Pagi & Shalat Subuh", icon: "fa-solid fa-mosque", color: "text-amber-400" },
     { id: 2, start: "05:30", end: "06:00", category: "Pagi", title: "Fisik", desc: "Olahraga Pagi (Kardio/Peregangan)", icon: "fa-solid fa-running", color: "text-teal-400" },
@@ -23,11 +23,11 @@ const dailySchedule = [
     { id: 18, start: "00:00", end: "05:00", category: "Tidur", title: "Tidur", desc: "Istirahat Total (Target 7 Jam Tidur)", icon: "fa-solid fa-z", color: "text-slate-500" }
 ];
 
-// Memuat status checklist dari LocalStorage agar data aman saat page direfresh
+// Load status checklist dari LocalStorage
 let checkedTasks = JSON.parse(localStorage.getItem('checkedTasks')) || {};
 let savedDate = localStorage.getItem('savedDate') || "";
 
-// Logika Auto-Reset Harian (Saat ganti hari kalender)
+// Reset Otomatis jika ganti hari kalender
 const todayStr = new Date().toDateString();
 if (savedDate !== todayStr) {
     checkedTasks = {};
@@ -35,19 +35,17 @@ if (savedDate !== todayStr) {
     localStorage.setItem('savedDate', todayStr);
 }
 
-// Me-render list jadwal ke UI HTML
+// Render data jadwal ke halaman
 function renderRoutine() {
     const container = document.getElementById('routine-container');
     container.innerHTML = "";
 
-    // Kategori Urutan Tampil
     const categories = ["Pagi", "Siang", "Sore & Malam", "Tidur"];
     
     categories.forEach(cat => {
         const catFiltered = dailySchedule.filter(item => item.category === cat);
         if (catFiltered.length === 0) return;
 
-        // Membuat section box untuk tiap Kategori
         const section = document.createElement('section');
         section.className = "bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm";
         
@@ -62,27 +60,16 @@ function renderRoutine() {
         catFiltered.forEach(item => {
             const uniqueKey = `task-${item.id}`;
             const isChecked = checkedTasks[uniqueKey] ? 'checked' : '';
-            const opacityClass = checkedTasks[uniqueKey] ? 'opacity-40 line-through' : '';
+            const opacityClass = checkedTasks[uniqueKey] ? 'opacity-30 line-through border-slate-800' : 'border-slate-700/50';
 
             const card = document.createElement('div');
             card.id = `card-${item.id}`;
-            card.className = `flex items-center justify-between p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 transition-all duration-300 hover:bg-slate-800/80 ${opacityClass}`;
+            card.className = `flex items-center justify-between p-4 rounded-xl bg-slate-800/40 border transition-all duration-300 hover:bg-slate-800/70 ${opacityClass}`;
             
             card.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <!-- Checkbox -->
-                    <label class="relative flex items-center p-1 rounded-full cursor-pointer">
-                        <input type="checkbox" ${isChecked} onchange="toggleTask('${uniqueKey}', ${item.id})" 
-                            class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-slate-600 transition-all checked:border-emerald-500 checked:bg-emerald-500" />
-                        <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" stroke-width="1">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                        </span>
-                    </label>
-
+                <div class="flex items-center gap-4 flex-1">
                     <!-- Jam Sesi -->
-                    <div class="text-xs font-mono font-semibold bg-slate-800 px-2.5 py-1 rounded-md text-emerald-300">
+                    <div class="text-xs font-mono font-semibold bg-slate-800 px-2.5 py-1 rounded-md text-emerald-300 shrink-0">
                         ${item.start} - ${item.end}
                     </div>
 
@@ -93,6 +80,12 @@ function renderRoutine() {
                         </h3>
                         <p class="text-xs md:text-sm text-slate-400 mt-0.5">${item.desc}</p>
                     </div>
+                </div>
+
+                <!-- Checkbox Interaktif yang Pasti Muncul -->
+                <div class="flex items-center pl-4">
+                    <input type="checkbox" id="check-${item.id}" ${isChecked} onchange="toggleTask('${uniqueKey}', ${item.id})" 
+                        class="w-6 h-6 rounded cursor-pointer accent-emerald-500 bg-slate-800 border-slate-700 focus:ring-emerald-500 focus:ring-2">
                 </div>
             `;
             listContainer.appendChild(card);
@@ -105,20 +98,22 @@ function renderRoutine() {
     updateActiveCard();
 }
 
-// Menyimpan perubahan checklist ke memory
+// Logika menyimpan status checklist dan mengubah style baris (buram & tercoret)
 function toggleTask(uniqueKey, itemId) {
     checkedTasks[uniqueKey] = !checkedTasks[uniqueKey];
     localStorage.setItem('checkedTasks', JSON.stringify(checkedTasks));
     
     const card = document.getElementById(`card-${itemId}`);
     if (checkedTasks[uniqueKey]) {
-        card.classList.add('opacity-40', 'line-through');
+        card.classList.add('opacity-30', 'line-through');
+        card.classList.replace('border-slate-700/50', 'border-slate-800');
     } else {
-        card.classList.remove('opacity-40', 'line-through');
+        card.classList.remove('opacity-30', 'line-through');
+        card.classList.replace('border-slate-800', 'border-slate-700/50');
     }
 }
 
-// Logika pencarian jadwal aktif & menerapkan class highlight "active-session"
+// Deteksi jam aktif saat ini
 function updateActiveCard() {
     const now = new Date();
     const currentHour = now.getHours();
@@ -137,7 +132,7 @@ function updateActiveCard() {
 
         let isCurrent = false;
 
-        // Penanganan deteksi jam khusus melewati tengah malam (misal 22:00 - 05:00)
+        // Handle jam melewati tengah malam
         if (endTimeInMinutes < startTimeInMinutes) {
             isCurrent = (currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes);
         } else {
@@ -152,7 +147,7 @@ function updateActiveCard() {
     });
 }
 
-// Inisialisasi jam digital realtime berjalan
+// Jam digital
 function startClock() {
     setInterval(() => {
         const now = new Date();
@@ -161,14 +156,12 @@ function startClock() {
         const seconds = String(now.getSeconds()).padStart(2, '0');
         document.getElementById('live-clock').innerText = `${hours}:${minutes}:${seconds}`;
         
-        // Cek & perbarui card aktif setiap detik ke-00 (setiap menit berganti)
         if (seconds === "00") {
             updateActiveCard();
         }
     }, 1000);
 }
 
-// Load aplikasi secara langsung ketika halaman siap dibuka
 window.onload = () => {
     renderRoutine();
     startClock();
